@@ -1,0 +1,64 @@
+import streamlit as st
+
+# 设置页面的配置项
+st.set_page_config(
+    # 网页标题名字
+    page_title="我超威",
+
+    # 网页标题前面的一个小图标
+    page_icon="🤡",
+
+    # 描述文本的大致位置，有centered、wide、None这三种，None默认为centered
+    layout="wide",
+      
+    # 控制侧边栏的状态
+    initial_sidebar_state="expanded",
+
+    # 侧边栏菜单的信息，需要自己设置网站
+    menu_items={
+        'Get Help': 'https://www.tgb.cn/',
+        'Report a bug': "https://www.tgb.cn/",
+        'About': "https://www.tgb.cn/"
+    }
+)
+
+
+# 大标题
+st.title("Streamlit 入门演示")
+st.header("Streamlit 一级标题")
+st.subheader("Streamlit 二级标题")
+
+# 段落文字
+st.write("2026年天神下凡，被誉为天下无敌的战神出来迎战")
+st.write("但是能力差距太大，战超节节败退，不得已向他的挚友学神求助")
+st.write("学神听说战神打不过天神，于是手写了一封书信传给天神")
+st.write("天神收到了信后，打开，刹那间，无数个文字锋锐无比，只是一眨眼的功夫，天神就四分五裂了！！！")
+
+# 图片
+st.image(r"C:\Users\33743\Desktop\图片素材\2.jpg", width = 300)
+
+# 音频
+st.audio(r"C:\Users\33743\Downloads\邓寓君(等什么君)-辞九门回忆.mp3")
+
+# 视频
+st.video(r"C:\Users\33743\Videos\屏幕录制\屏幕录制 2024-10-15 222605.mp4")
+
+# 表格
+student_data = {
+    "姓名" : ["xc", "小超", "小小超", "小超同学", 123],
+    "学号" : ["123", "456", "789", "101112", 23333],
+    "成绩" : [1234, 5678, 9101112, 13141516, 33333333333]
+}
+st.table(student_data, hide_index = False)
+
+# 输入框
+name = st.text_input("请输入你的姓名：")
+st.write(f"您输入你的姓名是：{name}")
+
+# 密码输入框
+xuehao = st.text_input("请输入你的学号：", type = "password")
+st.write(f"您输入的学号是：{xuehao}")
+
+# 单选按钮
+gender = st.radio("请输入您的性别：", ["男", "女", "未知"], index = 2)
+st.write(f"你的性别是：{gender}")
