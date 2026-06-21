@@ -1,0 +1,89 @@
+import os
+import streamlit as st
+from openai import OpenAI
+
+st.set_page_config(
+    page_title="AI智能伴侣",
+    page_icon="👩🏼‍🦰",
+    layout="wide",
+    initial_sidebar_state="expanded",
+    menu_items={}
+)
+
+# 大标题
+st.title("AI智能伴侣")
+
+# 添加logo
+st.logo(r"C:\Users\33743\Desktop\图片素材\1728115551394.jpg")
+st.markdown("***Ai is really cool.***")
+
+# 系统提示词
+system_prompt =  "你是一名功能强大的AI助手，你的任务就是尽可能解决用户提出的问题"
+
+# 初始化聊天信息
+if "message" not in st.session_state:
+    st.session_state.message  = []
+
+
+# 展示聊天信息
+for message in st.session_state.message:
+    st.chat_message(message["role"]).write(message["content"])
+    # if message["role"] == "user":
+    #     st.chat_message("user").write(message["content"])
+    # else:
+    #     st.chat_message("assistant").write(message["content"])
+
+
+
+# 创建与AI大模型交互的客户端对象（DEEPSEEK_API_KEY，环境变量的名字，值就是DeepSeek的API_KEY）
+client = OpenAI(api_key=os.environ.get('DEEPSEEK_API_KEY'), base_url="https://api.deepseek.com")
+
+
+# 消息输入框
+prompt = st.chat_input("请输入您要提问的问题：")
+if prompt: # 字符串会自动转化为布尔值：如果字符串不为空，就为True，否则为False
+    st.chat_message("user").write(prompt)
+    print("-----------> 调用AI大模型，提示词：", prompt)
+
+    st.session_state.message.append({"role" : "user", "content" : prompt})
+
+    # 调用AI大模型
+    # 与AI大模型进行交互（）
+    response = (client.chat.completions.create(
+        model="deepseek-v4-pro",
+        messages=[
+            {"role": "system", "content": system_prompt},
+            # {"role": "user", "content": prompt},
+            # 增加消息记忆功能
+            # 因为消息全部才能在sesson_state.message[]列表当中
+            # message[]列表的每一个元素都是字典，刚好对应AI大模型的message参数
+            # 所以直接对message[]列表经行解包操作
+            *st.session_state.message
+        ],
+        stream=True,
+        reasoning_effort="high",
+        extra_body={"thinking": {"type": "enabled"}}
+    ))
+
+    # 输出大模型返回的结果（非流式输出的方式）
+    # stream = False
+    # print("<----------- 大模型返回的结果：", response.choices[0].message.content)
+    # st.chat_message("assistant").write(response.choices[0].message.content)
+    # st.session_state.message.append({"role" : "assistant", "content" : response.choices[0].message.content})
+
+    # 输出大模型返回的结果（流式输出的方式）
+    # stream = True
+
+    response_message = st.empty() # 创建空的组件，用于展示大模型返回的结果
+    # st.empty()创建的一个空的组件
+    # 在每次循环里面的chunk的内容都会加到final_reponse中，然后展示在response_message中，它只创建一个组件，不会出现多个聊天组件
+    # 最重要的一点是流式文本的输出不是在之前的文本基础上添加，而是直接覆盖之前的文本，只是看起来像添加了
+    
+    final_response = ""
+    for chunk in response:
+        if chunk.choices[0].delta.content is not None:
+            content = chunk.choices[0].delta.content
+            final_response += content
+            response_message.chat_message("assistant").write(final_response)
+
+    st.session_state.message.append({"role" : "assistant", "content" : final_response})
