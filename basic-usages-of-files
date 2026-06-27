@@ -1,0 +1,116 @@
+"""2026年6月27日"""
+# 日常我们操作文件时，基本分为三步操作：打开、读/写、关闭
+
+# 1.打开文件
+# 包括常用的三个参数：第一个是文件路径，第二个是模式，第三个是编码（encoding）
+# 编码：是将字符（字符、数字、符号转化为计算机能够储存和处理的数字代码的规则系统，如ASCII、GBK、utf-8等）
+# 常用的模式：
+# "r"是read的缩写，表示只读（文件必须存在，否则报错：FileNotFoundError）
+# "w"是write的缩写，表示只写（文件存在则覆盖原来的内容写入，文件不存在则自动创建新文件）
+# "a"是append的缩写，表示追加写（文件存在则在原来的内容基础上追加写入，文件不存在则自动创建文件）
+# 常用的编码：
+# utf-8：国际通用，支持所有语言，推荐首选
+# GBK：中文Windows系统默认，简体中文常用
+# ASCII：仅支持英文字符，无法处理中文
+
+# 注意：在Windows上，如果不指定encoding，默认使用系统本地编码（例如GBK），跨平台时容易出错（强烈建议使用utf-8）
+# f是一个文件对象，更通俗的叫法是文件句柄，不需要知道资源具体的内存地址，只要拿着句柄就可以操作文件。这个对象封装了操作系统提供的底层资源，并提供了一些列可操作的方法
+f = open(r"C:\Users\33743\Desktop\develop\python_project\AI应用\usefile_test_read", "r", encoding ="utf-8")
+
+# 2.读取文件内容
+# f.read()方法，读取文件的所有内容，返回一个字符串
+# f.read(100)方法：读取文件的前100个字符，返回一个字符串
+contest = f.read() # contest就是一个字符串，包含了f文件中所有的内容，包括换行符
+print(contest)
+f.seek(0) # 将文件指针移动至文件开头
+contest1 = f.read(4)
+print(contest1)
+# 这里发现了一个问题，就是只打印了contest，而没有打印contest1。
+# 原因是：当调用f.read()时，它会读取整个文件的内容，并且文件指针会移动到文件末尾，之后再调用f.read(4)时，由于文件指针已经在文件末尾，没有更多的内容可以读取，所以contest1实际上是一个空字符串
+# 如果想要再次读取文件内容，则需要将文件指针移动至文件开头：f.seek(0)
+"""
+contest = f.read()
+print(contest)
+f.seek(0)
+contest1 = f.read(4)
+print(contest1)
+"""
+
+f.seek(0)
+# f.readline()方法：读取文件的第一行，返回一个字符串
+# f.readline(4)方法：读取文件第一行的前4个字符，返回一个字符串
+line = f.readline()
+print(line)
+
+f.seek(0)
+# f.readlines()方法：读取文件的所有行，返回一个list列表，列表中的元素就是每一行形成的字符串
+lines = f.readlines() # 打印：['你好，今天是2026年6月27日\n', '今天天气很晴朗\n', '但是我很困\n']
+print(lines)
+
+# 注意：不要使用read()或者readlines()方法一次性加载GB级文件，会占用大量的内存，导致程序崩溃
+# 可以使用for循环：for line in f:逐行迭代，内部使用缓冲区，效率高且内存占用低
+# 温故：字符串的strip()方法：用于取出字符串开头和结尾的多余字符，默认是空格和换行符。它不会修改原来的字符，而是返回一个新的结果
+f.seek(0)
+for line in f:
+    print(line.strip())
+
+# 3.关闭文件
+# 注意：如果操作完文件，并未调用close方法，同时程序没有停止运行，那么这个文件将一只被Python程序占用，无法操作！
+f.close()
+
+
+# 1.打开文件
+f = open(r"C:\Users\33743\Desktop\develop\python_project\AI应用\usefile_test_write", "w", encoding = "utf-8")
+
+# 2.写入文件内容
+# f.write()方法就是直接在文件的末尾继续写入字符串
+# f.writelines()方法也是在文件的末尾继续写入字符串，可以写入一个list列表，列表中的每个元素都是字符串
+f.write("静夜思（李白）\n\n")
+f.writelines(["长纤明月光，\n", "疑是地下霜。\n"])
+
+# 3.关闭文件
+f.close()
+# 注意：write()不会自动添加换行符号，需要手动添加\n
+# 注意：使用"w"模式会覆盖源文件；若不想丢失原有内容，用"a"追加模式
+
+
+
+"""
+两种安全关闭文件的方式
+方法1：使用try...finally语句
+f = open("file.txt", "r", encoding = "utf-8)
+try:
+    data = f.read()
+finally:
+    f.close() 无论是否异常，都会执行
+    
+方法2：with上下文管理器（推荐，因为代码简洁、自动管理资源，是Python社区的标准写法）
+with open("file.text", "r", encoding = "utf-8") as f:
+    data = f.read()
+    退出with代码块后，文件自动关闭（即使发生异常）
+"""
+
+"""
+编码（Encoding）
+Q：为什么需要编码
+A：计算机只能存储0/1二进制，而人类使用字符（字母、汉字、标点）。编码就是一张"字符<->二进制数字"的映射表
+Q：为什么要同一编码：
+A：因为不同的计算机系统和编程语言使用不同的字符编码，需要将字符转换为统一的编码，才能在不同的平台上正常显示和处理
+Q：为什么会出现乱码
+A：当使用不同的编码读取文件时，会将文件中的二进制数据解释为不同的字符，解码映射错误，就会显示乱码
+"""
+
+"""
+判断文件是否存在（避免FileNotFoundError）：
+import os
+if os.path.exists("file.txt")
+    with open(...) as f:
+    
+同时读写多个文件：
+with open("file1.txt", "r", encoding = "utf-8") as f1, open("file2.txt", "w", encoding = "utf-8") as f2:
+    f2.write(f1.read())
+    
+文件指针
+f.tell()方法：返回当前文件指针的位置
+f.seek()方法：将文件指针移动到指定位置
+"""
