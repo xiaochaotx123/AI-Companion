@@ -1,0 +1,70 @@
+"""2026年6月28日"""
+# JSON是软件开发中最常用的数据交换格式，而为了简化JSON数据的处理，在Python标准库中就提供了处理JSON数据的核心模块 json
+import json
+
+"""
+Q：Python和JSON的区别
+A：
+1，数据类型本质不同
+Python字典是Python语言内置的数据结构，是一个活在内存里的对象。可以随时直接对字典进行操作
+而JSON是一种纯文本格式（字符串），只有使用json.loads()方法解析成Python字典后才能进行代码操作
+2，键名（Key）和字符串的引号规则不同
+Python字典中键名可以使用单引号'，也可以使用双引号"，甚至可以不写引号（变量名形式）
+JSON中键名必须使用双引号"，绝对不能使用单引号'，也不能不写引号
+3，布尔值和空值的写法不同
+Python中使用True，False，None（首字母大写）
+JSON中使用true，false，null（全小写）
+如果在Python中写{"is_ok": True}，直接转成JSON字符串后会变成{"is_ok": true}，首写字母大小写变了
+4，元组(Tuple)与结尾逗号的处理不同
+Python中允许包含元组(1,2)，也允许在最后一个元素后面加多余的逗号
+JSON中不支持元组，且严禁在末尾添加多余的都好
+如果Python字典中有元组，直接使用json.dumps()方法会报错
+"""
+
+# 写入json数据文件
+user = {
+    "name": "小月",
+    "age": 18,
+    "gender": "女",
+    "hobbies": ["reading", "swimming"]
+}
+# 将Python字典（内存中的活对象）"序列化"成JSON文本，并保存到文件中
+"""
+json.dump(user, f, ensure_ascii = False, indent = 4)将字典user转换为JSON格式并存入文件f中
+user：需要操作的字典
+f：需要写入的文件对象
+ensure_ascii：这是Python处理JSON极为重要的参数。默认ensure_ascii = True时，为了兼顾老旧系统，所有非英文字符都会被转义为'\'uXXXX格式的Unicode编码，看起来就像是乱码一样
+将ensure_ascii设置为False后，配合encoding = "utf-8"，那么中文就会保留在文件中，而不是转义为'\'uXXXX格式的Unicode编码
+indent：缩进参数，如果不写这个参数，默认为None，那么所有的数据就会写在一行，比如{"name": "小月", "age": 18, "gender": "女", "hobbies": ["reading", "swimming"]}
+将indet设置为4，那么JSON库会在嵌套结构（如大括号内的键值对等）前添加换行，并缩进4个空格
+"""
+
+# 如果文件不存在，会自动创建一个文件写入，因为是"w"模式，但是如果是"r"模式，如果文件不存在，则会报错
+# 对象序列化
+with open(r"C:\Users\33743\Desktop\develop\python_project\AI应用\usejson_test.json", "w", encoding = "utf-8") as f:
+    json.dump(user, f, ensure_ascii = False, indent = 4)
+"""
+现在f那个文件中就会有：
+{
+    "name": "小月",
+    "age": 18,
+    "gender": "女",
+    "hobbies": [
+        "reading",
+        "swimming"
+    ]
+}
+"""
+
+# 对象反序列化
+with open(r"C:\Users\33743\Desktop\develop\python_project\AI应用\usejson_test.json", "r", encoding = "utf-8") as f:
+    user1 = json.load(f)
+    print(user1) # 输出：{'name': '小月', 'age': 18, 'gender': '女', 'hobbies': ['reading', 'swimming']}
+
+
+"""
+Q：json模块中进行对象序列化及反序列化的方法？
+A：
+json.dump()：将Python对象序列化为json格式字符串并写入文本；
+json.load()：从文件中读取json格式数据，并将其反序列化为Python对象
+"""
